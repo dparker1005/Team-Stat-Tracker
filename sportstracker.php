@@ -11,7 +11,7 @@ require_once(TEAMSTATTRACKER_DIR . '/includes/cpt_functions.php');
 $sports = get_posts(array('post_type'=>'sport'));
 
 foreach($sports as $sport){
-	if(file_exists(TEAMSTATTRACKER_DIR . esc_html( get_post_meta( $sport->ID, 'module_path', true ) ))){
+	if(is_file(TEAMSTATTRACKER_DIR . esc_html( get_post_meta( $sport->ID, 'module_path', true ) ))){
 		require_once(TEAMSTATTRACKER_DIR . esc_html( get_post_meta( $sport->ID, 'module_path', true ) ));
 	}
 }

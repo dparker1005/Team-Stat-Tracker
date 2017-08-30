@@ -5,6 +5,22 @@ function tst_fencing_tracker($atts, $content = null) {
     	<div v-show="screen==0">
     		<table>
     			<tr>
+    				<th>Bout Date</th>
+    				<td><input name="tst_date" type="date" value="<?php echo date('Y-m-d'); ?>"></td>
+    			</tr>
+    			<tr>
+    				<select name="tst_season_select">
+						<?php
+						$seasons = get_posts(array('post_type'=>'season'));
+						// Generate all items of drop-down list
+						foreach ( $seasons as $season ) {
+							if(get_post_meta(get_post_meta($season->ID, 'sport_id', true), 'module_path', true)=='/modules/fencing.php'){
+						?>
+							<option value="<?php echo($season->ID); ?>">
+							<?php echo($season->post_title); }} ?>
+					</select>
+    			</tr>
+    			<tr>
     				<th>Fencer 1 Name</th>
     				<th><input type="text" v-model="fencer1_name"></input></th>
     				<th>Fencer 1 School</th>
