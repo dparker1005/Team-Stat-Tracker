@@ -20,6 +20,7 @@ function tst_create_sport_cpt() {
       ),
       'public' => true,
       'has_archive' => true,
+      'menu_icon' => 'dashicons-megaphone'
     )
   );
   remove_post_type_support( 'sport', 'editor' );
@@ -38,6 +39,7 @@ add_action( 'admin_init', 'tst_create_sport_meta_box' );
 function tst_display_sport_meta_box( $sport ) {
     // Retrieve current name of the Director and Movie Rating based on review ID
     $module = esc_html( get_post_meta( $sport->ID, 'module_path', true ) );
+    $individual = esc_html( get_post_meta( $sport->ID, 'individual', true ) );
     ?>
     <table>
 		<tr>
@@ -64,16 +66,33 @@ function tst_display_sport_meta_box( $sport ) {
   				</ul>
             </td>
         </tr>
+        <tr>
+			<td style="width: 150px">Individual:</td>
+            <td>
+            	<p>
+            	<?php 
+            		if(empty($individual)){echo 'Unknown';}
+            		else{echo($individual);}
+            	?>
+            	</p>
+            </td>
+        </tr>
     </table>
     <?php
-}
+    }
 
 function tst_add_sport_fields( $sport_id, $sport ) {
     // Check post type for movie reviews
     if ( $sport->post_type == 'sport' ) {
         // store data in post meta table if present in post data
+        
         if ( isset( $_POST['tst_sport_module_path'] ) && $_POST['tst_sport_module_path'] != '' ) {
-            update_post_meta( $sport_id, 'module_path', $_POST['tst_sport_module_path'] );
+            if(is_file(TEAMSTATTRACKER_DIR . esc_html( $_POST['tst_sport_module_path'] ))){
+            	update_post_meta( $sport_id, 'module_path', $_POST['tst_sport_module_path'] );
+            	//require_once should have a hook to save_post that activates after this,
+            	//setting post meta for $individual
+				require_once(TEAMSTATTRACKER_DIR . esc_html( $_POST['tst_sport_module_path'] ));
+			}
         }
     }
 }
@@ -99,6 +118,7 @@ function tst_create_season_cpt() {
       ),
       'public' => true,
       'has_archive' => true,
+      'menu_icon' => 'dashicons-calendar-alt'
     )
   );
   remove_post_type_support( 'season', 'editor' );
@@ -235,6 +255,7 @@ function tst_create_team_cpt() {
       ),
       'public' => true,
       'has_archive' => true,
+      'menu_icon' => 'dashicons-groups'
     )
   );
   remove_post_type_support( 'team', 'editor' );
@@ -301,6 +322,16 @@ function tst_display_team_meta_box( $team ) {
   				</ul>
             </td>
         </tr>
+        <tr>
+        	<td style="width: 150px">Matches</td>
+            <td>
+            	<ul>
+					<li>Match1</li>
+					<li>Match2</li>
+					<li>Match3</li>
+  				</ul>
+            </td>
+        </tr>
     </table>
     <?php
 }
@@ -345,6 +376,7 @@ function tst_create_player_cpt() {
       ),
       'public' => true,
       'has_archive' => true,
+      'menu_icon' => 'dashicons-id'
     )
   );
   remove_post_type_support( 'player', 'editor' );
@@ -486,6 +518,7 @@ function tst_create_match_cpt() {
       ),
       'public' => true,
       'has_archive' => true,
+      'menu_icon' => 'dashicons-forms'
     )
   );
   remove_post_type_support( 'match', 'editor' );
@@ -504,7 +537,7 @@ add_action( 'admin_init', 'tst_create_match_meta_box' );
 
 function tst_display_match_meta_box( $match ) {
     // Retrieve current name of the Director and Movie Rating based on review ID
-    $individual = esc_html( get_post_meta( $match->ID, 'individual', true ) );
+    $season_id = intval( get_post_meta( $match->ID, 'season_id', true ) );
     $date = esc_html( get_post_meta( $match->ID, 'date', true ) );
     $team_1 = intval( get_post_meta( $match->ID, 'team_1', true ) );
     $team_2 = intval( get_post_meta( $match->ID, 'team_2', true ) );
@@ -516,7 +549,72 @@ function tst_display_match_meta_box( $match ) {
     $events_arr = esc_html( get_post_meta( $match->ID, 'events_arr', true ) );
     ?>
     <table>
-
+		<tr>
+			<h1>WARNING: DO NOT ATTEMPT TO EDIT UNLESS YOU KNOW WHAT YOU ARE DOING</h1>
+		</tr>
+		<tr>
+			<td style="width: 100%">Season ID</td>
+			<td>
+				<input type="text" size="80" name="tst_season_id" value="<?php echo $season_id; ?>" />			
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 100%">Date</td>
+			<td>
+				<input type="date" size="80" name="tst_date" value="<?php echo $date; ?>" />			
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 100%">Team 1 ID</td>
+			<td>
+				<input type="text" size="80" name="tst_team_id_1" value="<?php echo $team_1; ?>" />			
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 100%">Player 1 ID</td>
+			<td>
+				<input type="text" size="80" name="tst_player_id_1" value="<?php echo $player_1; ?>" />			
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 100%">Team 2 ID</td>
+			<td>
+				<input type="text" size="80" name="tst_team_id_2" value="<?php echo $team_2; ?>" />			
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 100%">Player 2 ID</td>
+			<td>
+				<input type="text" size="80" name="tst_player_id_2" value="<?php echo $player_2; ?>" />			
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 150px">Winning Side</td>
+            <td>
+                <select style="width: 100px" name="tst_winner_select">
+                    <option value="1" <?php echo selected( $winning_side, 1 ); ?>>1
+                    <option value="2" <?php echo selected( $winning_side, 2 ); ?>>2
+                </select>
+            </td>
+        </tr>
+        <tr>
+			<td style="width: 100%">Side 1 Score</td>
+			<td>
+				<input type="text" size="80" name="tst_side_1_score" value="<?php echo $side_1_score; ?>" />			
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 100%">Side 2 Score</td>
+			<td>
+				<input type="text" size="80" name="tst_side_2_score" value="<?php echo $side_2_score; ?>" />			
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 100%">Events</td>
+			<td>
+				<input type="textarea" size="80" name="tst_events" value="<?php echo json_encode($events_arr); ?>" />			
+			</td>
+		</tr>
     </table>
     <?php
 }
@@ -525,12 +623,62 @@ function tst_add_match_fields( $match_id, $match ) {
     // Check post type for movie reviews
     if ( $match->post_type == 'match' ) {
         // store data in post meta table if present in post data
-        if ( isset( $_POST['tst_match_name'] ) && $_POST['tst_match_name'] != '' ) {
-            update_post_meta( $match_id, 'name', $_POST['tst_match_name'] );
+        $new_post_title = '';
+        if ( isset( $_POST['tst_season_id'] ) && $_POST['tst_season_id'] != '' ) {
+            update_post_meta( $match_id, 'season_id', $_POST['tst_season_id'] );
+            $season_title = esc_html(get_post(intval($_POST['tst_season_id']))->post_title);
+            if(!empty($season_title) && $season_title != ''){
+            	$new_post_title .= $season_title . ", ";
+            }
         }
-        if ( isset( $_POST['tst_match_module'] ) && $_POST['tst_match_module'] != '' ) {
-            update_post_meta( $match_id, 'module', $_POST['tst_match_module'] );
+        if ( isset( $_POST['tst_player_id_1'] ) && $_POST['tst_player_id_1'] != '' ) {
+            update_post_meta( $match_id, 'player_1', $_POST['tst_player_id_1'] );
+            $player_name = esc_html(get_post_meta(intval($_POST['tst_player_id_1']), 'last_name', true));
+            if(!empty($player_name) && $player_name != ''){
+            	$new_post_title .= $player_name;
+            }
         }
+        $new_post_title .= '(';
+        if ( isset( $_POST['tst_team_id_1'] ) && $_POST['tst_team_id_1'] != '' ) {
+            update_post_meta( $match_id, 'team_1', $_POST['tst_team_id_1'] );
+            $team_name = esc_html(get_post_meta(intval($_POST['tst_team_id_1']), 'name', true));
+            if(!empty($team_name) && $team_name != ''){
+            	$new_post_title .= $team_name;
+            }
+        }
+        $new_post_title .= ') vs. ';
+         if ( isset( $_POST['tst_player_id_2'] ) && $_POST['tst_player_id_2'] != '' ) {
+            update_post_meta( $match_id, 'player_2', $_POST['tst_player_id_2'] );
+            $player_name = esc_html(get_post_meta(intval($_POST['tst_player_id_2']), 'last_name', true));
+            if(!empty($player_name) && $player_name != ''){
+            	$new_post_title .= $player_name;
+            }
+        }
+        $new_post_title .= '(';
+        if ( isset( $_POST['tst_team_id_2'] ) && $_POST['tst_team_id_2'] != '' ) {
+            update_post_meta( $match_id, 'team_2', $_POST['tst_team_id_2'] );
+            $team_name = esc_html(get_post_meta(intval($_POST['tst_team_id_2']), 'name', true));
+            if(!empty($team_name) && $team_name != ''){
+            	$new_post_title .= $team_name;
+            }
+        }
+        $new_post_title .= '), ';
+        if ( isset( $_POST['tst_date'] ) && $_POST['tst_date'] != '' ) {
+            update_post_meta( $match_id, 'date', $_POST['tst_date'] );
+            $new_post_title .= $_POST['tst_date'];
+        }
+        if ( isset( $_POST['tst_winner_select'] ) && $_POST['tst_winner_select'] != '' ) {
+            update_post_meta( $match_id, 'winning_side', $_POST['tst_winner_select'] );
+        }
+        if ( isset( $_POST['tst_side_1_score'] ) && $_POST['tst_side_1_score'] != '' ) {
+            update_post_meta( $match_id, 'side_1_score', $_POST['tst_side_1_score'] );
+        }
+        if ( isset( $_POST['tst_side_2_score'] ) && $_POST['tst_side_2_score'] != '' ) {
+            update_post_meta( $match_id, 'side_2_score', $_POST['tst_side_2_score'] );
+        }
+        remove_action( 'save_post', 'tst_add_match_fields', 10, 2 );
+        wp_update_post(array('ID'=> $match_id, 'post_title'=>$new_post_title));
+        add_action( 'save_post', 'tst_add_match_fields', 10, 2 );
     }
 }
 add_action( 'save_post', 'tst_add_match_fields', 10, 2 );
