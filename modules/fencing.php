@@ -33,6 +33,17 @@ function tst_fencing_tracker($atts, $content = null) {
 					</select>
     			</tr>
     			<tr>
+    				<th>Weapon</th>
+    				<td>
+    					<select name="tst_weapon_select">
+    						<option value="0">
+							<option value="1">Sabre
+							<option value="2">Foil
+							<option value="3">Epee
+						</select>
+    				</td>
+    			</tr>
+    			<tr>
     				<th>Fencer 1 Name</th>
     				<th><input type="text" v-model="fencer1_name"></input></th>
     				<th>Fencer 1 School</th>

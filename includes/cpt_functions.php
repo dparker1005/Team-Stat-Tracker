@@ -546,7 +546,8 @@ function tst_display_match_meta_box( $match ) {
     $winning_side = intval( get_post_meta( $match->ID, 'winning_side', true ) );
     $side_1_score = intval( get_post_meta( $match->ID, 'side_1_score', true ) );
     $side_2_score = intval( get_post_meta( $match->ID, 'side_2_score', true ) );
-    $events_arr = esc_html( get_post_meta( $match->ID, 'events_arr', true ) );
+    $events_json = esc_html( get_post_meta( $match->ID, 'events_json', true ) );
+    $meta_json = esc_html( get_post_meta( $match->ID, 'meta_json', true ) );
     ?>
     <table>
 		<tr>
@@ -612,7 +613,13 @@ function tst_display_match_meta_box( $match ) {
 		<tr>
 			<td style="width: 100%">Events</td>
 			<td>
-				<input type="textarea" size="80" name="tst_events" value="<?php echo json_encode($events_arr); ?>" />			
+				<textarea rows="15" cols="75" name="tst_events"><?php echo $events_json; ?></textarea>			
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 100%">Meta Data</td>
+			<td>
+				<input type="text" size="80" name="tst_meta" value="<?php echo $meta_json; ?>" />			
 			</td>
 		</tr>
     </table>
@@ -675,6 +682,12 @@ function tst_add_match_fields( $match_id, $match ) {
         }
         if ( isset( $_POST['tst_side_2_score'] ) && $_POST['tst_side_2_score'] != '' ) {
             update_post_meta( $match_id, 'side_2_score', $_POST['tst_side_2_score'] );
+        }
+        if ( isset( $_POST['tst_events'] ) && $_POST['tst_events'] != '' ) {
+            update_post_meta( $match_id, 'events_json', $_POST['tst_events'] );
+        }
+        if ( isset( $_POST['tst_meta'] ) && $_POST['tst_meta'] != '' ) {
+            update_post_meta( $match_id, 'meta_json', $_POST['tst_meta'] );
         }
         remove_action( 'save_post', 'tst_add_match_fields', 10, 2 );
         wp_update_post(array('ID'=> $match_id, 'post_title'=>$new_post_title));
